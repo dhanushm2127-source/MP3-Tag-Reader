@@ -3,7 +3,6 @@
 #include "type.h"
 #include "view.h"
 
-static const char* tag[] = {"TIT2", "TPE1", "TALB", "TYER", "TCON", "TCOM"};
 int num = 1;
 
 Status read_and_validate_view_args(char *argv[], ViewInfo *viewInfo)
@@ -27,9 +26,8 @@ Status read_and_validate_view_args(char *argv[], ViewInfo *viewInfo)
         printf("Error....File doesnot opened\n");
         return e_failure;
     }
-    return e_success;
 
-    char signature[3];
+    char signature[4];
     fread(signature, 3, 1, viewInfo -> fptr_view_mp3);
     signature[3] = '\0';
     if(strcmp(signature, "ID3") != 0)
@@ -75,8 +73,6 @@ uint get_size(unsigned char *size_buffer)
     {
         ptr[i] = size_buffer[i];
     }
-    sscanf(size_buffer, "%d", &size);
-    printf("Size = %u\n",size);
     return size;
 }
 
@@ -85,7 +81,7 @@ Status view_operation(ViewInfo *viewInfo)
     char tag_buff[5];
     char size_buff[4];
     uint size;
-    printf("%-20s | %-20s | %-20s\n","SI. No", "Tag", "Tag Info");
+    printf("%-8s | %-10s | %s\n","SI. No", "Tag", "Tag Info");
     for(int i = 0; i < 6; i++)
     {
         //Read 4 bytes of tag
@@ -94,8 +90,6 @@ Status view_operation(ViewInfo *viewInfo)
 
         //Read 4 bytes of size
         fread(size_buff, 4, 1, viewInfo -> fptr_view_mp3);
-        printf("%s\n",tag_buff);
-        printf("%s\n",size_buff);
         //To get size in little endian
         size = get_size(size_buff);
 
@@ -104,15 +98,32 @@ Status view_operation(ViewInfo *viewInfo)
         char buffer[size];
         //Read size - 1 bytes of meta data
         fread(buffer, size - 1, 1, viewInfo -> fptr_view_mp3);
-
+        buffer[size - 1] = '\0';
+        
         //Check tag is of "TIT2 / TPE1 / TALB / TYER / TCON / TCOM"
-        for(int i = 0; i < 6; i++)
+        if(strcmp(tag_buff, "TIT2") == 0)
         {
-            if(!strcmp(tag_buff, tag[i]))
-            {
-                printf("%-20d | %-20s | %-20s\n",num++, tag_buff, buffer);
-                break;
-            }
+            printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
+        }
+        else if(strcmp(tag_buff, "TPE1") == 0)
+        {
+            printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer );
+        }
+        else if(strcmp(tag_buff, "TALB") == 0)
+        {
+            printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
+        }
+        else if(strcmp(tag_buff, "TYER") == 0)
+        {
+            printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
+        }
+        else if(strcmp(tag_buff, "TCON") == 0)
+        {
+            printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
+        }
+        else if(strcmp(tag_buff, "TCOM") == 0)
+        {
+            printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
         }
     }
     fclose(viewInfo -> fptr_view_mp3);
