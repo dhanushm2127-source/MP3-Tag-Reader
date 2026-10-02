@@ -3,8 +3,6 @@
 #include "type.h"
 #include "view.h"
 
-int num = 1;
-
 Status read_and_validate_view_args(char *argv[], ViewInfo *viewInfo)
 {
     if(argv[2] == NULL)
@@ -81,6 +79,7 @@ Status view_operation(ViewInfo *viewInfo)
     char tag_buff[5];
     char size_buff[4];
     uint size;
+    int num = 1;
     printf("%-8s | %-10s | %s\n","SI. No", "Tag", "Tag Info");
     for(int i = 0; i < 6; i++)
     {
@@ -100,7 +99,7 @@ Status view_operation(ViewInfo *viewInfo)
         fread(buffer, size - 1, 1, viewInfo -> fptr_view_mp3);
         buffer[size - 1] = '\0';
         
-        //Check tag is of "TIT2 / TPE1 / TALB / TYER / TCON / TCOM"
+        //Check tag is of "TIT2 / TPE1 / TALB / TYER / TCON / COMM"
         if(strcmp(tag_buff, "TIT2") == 0)
         {
             printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
@@ -121,7 +120,7 @@ Status view_operation(ViewInfo *viewInfo)
         {
             printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
         }
-        else if(strcmp(tag_buff, "TCOM") == 0)
+        else if(strcmp(tag_buff, "COMM") == 0)
         {
             printf("%-8d | %-10s | %s\n",num++, tag_buff, buffer);
         }
