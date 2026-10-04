@@ -32,7 +32,7 @@ Status read_and_validate_edit_args(char *argv[], EditInfo *editInfo);
 Status get_tag_edit(char edit_tag, EditInfo * editInfo);
 
 /* Get File pointers for i/p and o/p files */
-Status open_files(EditInfo *editInfo);
+Status open_edit_files(EditInfo *editInfo);
 
 /*Do edit operation*/
 Status edit_operation(EditInfo *editInfo);
