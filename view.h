@@ -6,14 +6,14 @@
 
 typedef struct _ViewInfo
 {
-    /* Source Image info */
+    /* View info */
     char *view_mp3_fname;
     FILE *fptr_view_mp3;
 
 } ViewInfo;
 
 
-/* Encoding function prototype */
+/* View function prototype */
 
 /* Check operation type */
 OperationType check_operation_type(char opt);
