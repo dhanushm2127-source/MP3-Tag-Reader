@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "type.h"
 #include "view.h"
 #include "edit.h"
@@ -36,16 +37,24 @@ int main(int argc, char *argv[])
         }
         edit_operation(&editInfo);
     }
-    else if(argc == 2 && check_operation_type(argv[1][1]) == '-' && check_operation_type(argv[1][2]) == e_help)
+    else if(argc == 2 && check_operation_type(argv[1][1]) == e_help)
+    {
+        printf("ERORR: ./a.out : INVALID ARGUMENTS\nUSAGE\n");
+        printf("To view please pass like : ./a.out -v mp3file_name\n");
+        printf("To edit please pass like : ./a.out -e (-t/-a/-A/-M/-y/-c) 'New data' mp3file_name\n");
+        printf("To help menu please pass like : ./a.out --help\n");
+        return 0;
+    } 
+    else if(strcmp(argv[1], "--help") == 0)
     {
         printf("1. -v  -> to view mp3 file contents\n");
         printf("2. -e  -> to edit mp3 file contents\n");
         printf("\t 2.1. -t  -> to edit song title\n");
-        printf("\t 2.1. -a  -> to edit artist name\n");
-        printf("\t 2.1. -A  -> to edit album name\n");
-        printf("\t 2.1. -y  -> to edit year\n");
-        printf("\t 2.1. -m  -> to edit content\n");
-        printf("\t 2.1. -c  -> to edit comment\n");
+        printf("\t 2.2. -a  -> to edit artist name\n");
+        printf("\t 2.3. -A  -> to edit album name\n");
+        printf("\t 2.4. -y  -> to edit year\n");
+        printf("\t 2.5. -m  -> to edit content\n");
+        printf("\t 2.6. -c  -> to edit comment\n");
         return 0;
     }
     else

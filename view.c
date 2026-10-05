@@ -52,8 +52,7 @@ Status open_files(ViewInfo *viewInfo)
         printf("MP3 file is not opened.\n");
         return e_failure;
     } 
-
-    printf("File is opened successfully\n");
+    //printf("File is opened successfully\n");
     return e_success;
 }
 

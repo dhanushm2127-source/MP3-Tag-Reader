@@ -102,7 +102,7 @@ Status open_edit_files(EditInfo *editInfo)
         printf("MP3 file is not opened.\n");
         return e_failure;
     } 
-    printf("File is opened successfully\n");
+    //printf("File is opened successfully\n");
     return e_success;
 }
 
@@ -146,12 +146,10 @@ Status edit_operation(EditInfo *editInfo)
     char header_buff[10];
     if(fread(header_buff, 10, 1, editInfo -> fptr_edit_mp3) != 1)
     {
-        printf("1\n");
         return e_failure;
     }
     if(fwrite(header_buff, 10, 1, editInfo -> fptr_temp_mp3) != 1)
     {
-        printf("2\n");
         return e_failure;
     }
 
@@ -160,13 +158,11 @@ Status edit_operation(EditInfo *editInfo)
         //Read the tag of 4 byte
         if(fread(tag_buff, 4, 1, editInfo -> fptr_edit_mp3) != 1)
         {
-            printf("3\n");
             return e_failure;
         }
         //Store the tag to temp mp3 file
         if(fwrite(tag_buff, 4, 1, editInfo -> fptr_temp_mp3) != 1)
         {
-            printf("4\n");
             return e_failure;
         }
         tag_buff[4] = '\0';
@@ -174,7 +170,6 @@ Status edit_operation(EditInfo *editInfo)
         //Reading size as 4 bytes, convert to little to big
         if(fread(size_buff, 4, 1, editInfo -> fptr_edit_mp3) != 1)
         {
-            printf("5\n");
             return e_failure;
         }
         size = get_edit_size(size_buff);
@@ -187,25 +182,21 @@ Status edit_operation(EditInfo *editInfo)
             convert_little_to_big((strlen(editInfo -> new_data) + 1), new_size);
             if(fwrite(new_size, 4, 1, editInfo -> fptr_temp_mp3) != 1)
             {
-                printf("6\n");
                 return e_failure;
             }
             //Copy the next 3 byte
             char flag_buffer[3];
             if(fread(flag_buffer, 3, 1, editInfo -> fptr_edit_mp3) != 1)
             {
-                printf("7\n");
                 return e_failure;
             }
             if(fwrite(flag_buffer, 3, 1, editInfo -> fptr_temp_mp3) != 1)
             {
-                printf("8\n");
                 return e_failure;
             }
 
             if(fwrite(editInfo -> new_data, strlen(editInfo -> new_data), 1, editInfo -> fptr_temp_mp3) != 1)
             {
-                printf("9\n");
                 return e_failure;
             }
             fseek(editInfo -> fptr_edit_mp3, size - 1, SEEK_CUR);
@@ -214,7 +205,6 @@ Status edit_operation(EditInfo *editInfo)
 
         if(fwrite(size_buff, 4, 1, editInfo -> fptr_temp_mp3) != 1)
         {
-            printf("10\n");
             return e_failure;
         }
 
@@ -222,24 +212,20 @@ Status edit_operation(EditInfo *editInfo)
         char flag_buff[3];
         if(fread(flag_buff, 3, 1, editInfo -> fptr_edit_mp3) != 1)
         {
-            printf("11\n");
             return e_failure;
         }
         if(fwrite(flag_buff, 3, 1, editInfo -> fptr_temp_mp3) != 1)
         {
-            printf("12\n");
             return e_failure;
         }
 
         char buff[size];
         if(fread(buff, size - 1, 1, editInfo -> fptr_edit_mp3)  != 1)
         {
-            printf("13\n");
             return e_failure;
         }
         if(fwrite(buff, size - 1, 1, editInfo -> fptr_temp_mp3)  != 1)
         {
-            printf("14\n");
             return e_failure;
         }
     }
@@ -248,12 +234,14 @@ Status edit_operation(EditInfo *editInfo)
     {
         if(fwrite(&data, 1, 1, editInfo -> fptr_temp_mp3)  != 1)
         {
-            printf("15\n");
             return e_failure;
         }
     }
-    printf("Edited Successfully\n");
+    
     fclose(editInfo -> fptr_edit_mp3);
     fclose(editInfo -> fptr_temp_mp3);
+    remove(editInfo -> edit_mp3_fname);
+    rename(editInfo -> temp_mp3_fname, editInfo -> edit_mp3_fname);
+    printf("Edited Successfully\n");
     return e_success;
 }
