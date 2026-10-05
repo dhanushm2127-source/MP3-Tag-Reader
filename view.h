@@ -16,7 +16,7 @@ typedef struct _ViewInfo
 /* View function prototype */
 
 /* Check operation type */
-OperationType check_operation_type(char opt);
+OperationType check_operation_type(char *opt);
 
 /* Read and validate args from argv */
 Status read_and_validate_view_args(char *argv[], ViewInfo *viewInfo);

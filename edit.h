@@ -23,7 +23,7 @@ typedef struct _EditInfo
 /* Edit function prototype */
 
 /* Check operation type */
-OperationType check_operation_type(char opt);
+OperationType check_operation_type(char *opt);
 
 /* Read and validate args from argv */
 Status read_and_validate_edit_args(char *argv[], EditInfo *editInfo);
