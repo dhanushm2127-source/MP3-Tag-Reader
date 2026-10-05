@@ -7,16 +7,16 @@ int main(int argc, char *argv[])
 {
     ViewInfo viewInfo;
     EditInfo editInfo;
-    if(argc < 3)
+    if(argc < 2)
     {
         printf("ERORR: ./a.out : INVALID ARGUMENTS\nUSAGE\n");
         printf("To view please pass like : ./a.out -v mp3file_name\n");
         printf("To edit please pass like : ./a.out -e -t/-a/-A/-M/-y/-c mp3file_name\n");
         return 0;
-    }
-    if(check_operation_type(argv[1][1]) == e_view)
+    } 
+    if(argc == 3 && check_operation_type(argv[1][1]) == e_view)
     {
-        if(argc == 3 && read_and_validate_view_args(argv, &viewInfo) == e_failure)
+        if(read_and_validate_view_args(argv, &viewInfo) == e_failure)
         {
             printf("ERORR: ./a.out : INVALID ARGUMENTS\nUSAGE\n");
             printf("To view please pass like : ./a.out -v mp3file_name\n");
@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
         }
         view_operation(&viewInfo);
     }
-    else if(check_operation_type(argv[1][1]) == e_edit)
+    else if(argc == 5 && check_operation_type(argv[1][1]) == e_edit)
     {
-        if(argc == 5 && read_and_validate_edit_args(argv, &editInfo) == e_failure)
+        if(read_and_validate_edit_args(argv, &editInfo) == e_failure)
         {
             printf("ERORR: ./a.out : INVALID ARGUMENTS\nUSAGE\n");
             printf("To view please pass like : ./a.out -v mp3file_name\n");
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         }
         edit_operation(&editInfo);
     }
-    else if(check_operation_type(argv[1][2]) == e_help)
+    else if(argc == 2 && check_operation_type(argv[1][1]) == '-' && check_operation_type(argv[1][2]) == e_help)
     {
         printf("1. -v  -> to view mp3 file contents\n");
         printf("2. -e  -> to edit mp3 file contents\n");

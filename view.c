@@ -26,7 +26,10 @@ Status read_and_validate_view_args(char *argv[], ViewInfo *viewInfo)
     }
 
     char signature[4];
-    fread(signature, 3, 1, viewInfo -> fptr_view_mp3);
+    if(fread(signature, 3, 1, viewInfo -> fptr_view_mp3)  != 1)
+    {
+        return e_failure;
+    }
     signature[3] = '\0';
     if(strcmp(signature, "ID3") != 0)
     {
@@ -84,11 +87,17 @@ Status view_operation(ViewInfo *viewInfo)
     for(int i = 0; i < 6; i++)
     {
         //Read 4 bytes of tag
-        fread(tag_buff, 4, 1, viewInfo -> fptr_view_mp3);
+        if(fread(tag_buff, 4, 1, viewInfo -> fptr_view_mp3)  != 1)
+        {
+            return e_failure;
+        }
         tag_buff[4] = '\0';
 
         //Read 4 bytes of size
-        fread(size_buff, 4, 1, viewInfo -> fptr_view_mp3);
+        if(fread(size_buff, 4, 1, viewInfo -> fptr_view_mp3)  != 1)
+        {
+            return e_failure;
+        }
         //To get size in little endian
         size = get_size(size_buff);
 
@@ -96,7 +105,10 @@ Status view_operation(ViewInfo *viewInfo)
         fseek(viewInfo -> fptr_view_mp3, 3, SEEK_CUR);
         char buffer[size];
         //Read size - 1 bytes of meta data
-        fread(buffer, size - 1, 1, viewInfo -> fptr_view_mp3);
+        if(fread(buffer, size - 1, 1, viewInfo -> fptr_view_mp3) != 1)
+        {
+            return e_failure;
+        }
         buffer[size - 1] = '\0';
         
         //Check tag is of "TIT2 / TPE1 / TALB / TYER / TCON / COMM"

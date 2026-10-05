@@ -45,11 +45,11 @@ Status read_and_validate_edit_args(char *argv[], EditInfo *editInfo)
         return e_failure;
     }
 
-    if(argv[4] == NULL)
+    /*if(argv[4] == NULL)
     {
         printf("Invalid Input arguments\n");
         return e_failure;
-    }
+    }*/
 
     char *dot = strrchr(argv[4], '.');
     if(dot == NULL || strcmp(dot, ".mp3") != 0)
@@ -69,7 +69,10 @@ Status read_and_validate_edit_args(char *argv[], EditInfo *editInfo)
     }
 
     char signature[4];
-    fread(signature, 3, 1, editInfo -> fptr_edit_mp3);
+    if(fread(signature, 3, 1, editInfo -> fptr_edit_mp3) != 1)
+    {
+        return e_failure;
+    }
     signature[3] = '\0';
     if(strcmp(signature, "ID3") != 0)
     {
@@ -135,25 +138,41 @@ void convert_little_to_big(int size, unsigned char *new_size)
 Status edit_operation(EditInfo *editInfo)
 {
     char tag_buff[5];
-    char size_buff[4];
-    char new_size[4];
+    unsigned char size_buff[4];
+    unsigned char new_size[4];
     uint size;
     
     //Copy header from edit file to temp file
     char header_buff[10];
-    fread(header_buff, 10, 1, editInfo -> fptr_edit_mp3);
-    fwrite(header_buff, 10, 1, editInfo -> fptr_temp_mp3);
+    if(fread(header_buff, 10, 1, editInfo -> fptr_edit_mp3) != 1)
+    {
+        return e_failure;
+    }
+    if(fwrite(header_buff, 10, 1, editInfo -> fptr_temp_mp3) != 1)
+    {
+        return e_failure;
+    }
 
     for(int i = 0; i < 6; i++)
     {
         //Read the tag of 4 byte
-        fread(tag_buff, 4, 1, editInfo -> fptr_edit_mp3);
+        if(fread(tag_buff, 4, 1, editInfo -> fptr_edit_mp3) != 1)
+        {
+            return e_failure;
+        }
         //Store the tag to temp mp3 file
-        fwrite(tag_buff, 4, 1, editInfo -> fptr_temp_mp3);
+        if(fwrite(tag_buff, 4, 1, editInfo -> fptr_temp_mp3) != 1)
+        {
+            return e_failure;
+        }
         tag_buff[4] = '\0';
 
         //Reading size as 4 bytes, convert to little to big
-        fread(tag_buff, 4, 1, editInfo -> fptr_edit_mp3);
+        if(fread(tag_buff, 4, 1, editInfo -> fptr_edit_mp3) != 1)
+        {
+            return e_failure;
+        }
+        size = get_edit_size(size_buff);
         convert_little_to_big(size, size_buff);
 
         //Check tags are same or not
@@ -161,32 +180,62 @@ Status edit_operation(EditInfo *editInfo)
         {
             //If not same, copy the size to temp mp3 file in big endian
             convert_little_to_big((strlen(editInfo -> new_data) + 1), new_size);
-            fwrite(new_size, 1, 4, editInfo -> fptr_temp_mp3);
+            if(fwrite(new_size, 1, 4, editInfo -> fptr_temp_mp3) != 1)
+            {
+                return e_failure;
+            }
             //Copy the next 3 byte
             char flag_buffer[3];
-            fread(flag_buffer, 3, 1, editInfo -> fptr_edit_mp3);
-            fwrite(flag_buffer, 3, 1, editInfo -> fptr_temp_mp3);
+            if(fread(flag_buffer, 3, 1, editInfo -> fptr_edit_mp3) != 1)
+            {
+                return e_failure;
+            }
+            if(fwrite(flag_buffer, 3, 1, editInfo -> fptr_temp_mp3) != 1)
+            {
+                return e_failure;
+            }
 
-            fwrite(editInfo -> new_data, strlen(editInfo -> new_data), 1, editInfo -> fptr_temp_mp3);
+            if(fwrite(editInfo -> new_data, strlen(editInfo -> new_data), 1, editInfo -> fptr_temp_mp3) != 1)
+            {
+                return e_failure;
+            }
             fseek(editInfo -> fptr_edit_mp3, size - 1, SEEK_CUR);
             break;
         }
 
-        fwrite(size_buff, 4, 1, editInfo -> fptr_edit_mp3);
+        if(fwrite(size_buff, 4, 1, editInfo -> fptr_edit_mp3) != 1)
+        {
+            return e_failure;
+        }
 
         //Read 3 bytes(2 bytes -> flag, 1 byte -> NULL charater)
         char flag_buff[3];
-        fread(flag_buff, 3, 1, editInfo -> fptr_edit_mp3);
-        fwrite(flag_buff, 3, 1, editInfo -> fptr_temp_mp3);
+        if(fread(flag_buff, 3, 1, editInfo -> fptr_edit_mp3) != 1)
+        {
+            return e_failure;
+        }
+        if(fwrite(flag_buff, 3, 1, editInfo -> fptr_temp_mp3) != 1)
+        {
+            return e_failure;
+        }
 
         char buff[size];
-        fread(buff, size - 1, 1, editInfo -> fptr_edit_mp3);
-        fwrite(buff, size - 1, 1, editInfo -> fptr_temp_mp3);
+        if(fread(buff, size - 1, 1, editInfo -> fptr_edit_mp3)  != 1)
+        {
+            return e_failure;
+        }
+        if(fwrite(buff, size - 1, 1, editInfo -> fptr_temp_mp3)  != 1)
+        {
+            return e_failure;
+        }
     }
     char data;
     while(fread(&data, 1, 1, editInfo -> fptr_edit_mp3) == 1)
     {
-        fwrite(&data, 1, 1, editInfo -> fptr_temp_mp3);
+        if(fwrite(&data, 1, 1, editInfo -> fptr_temp_mp3)  != 1)
+        {
+            return e_failure;
+        }
     }
     printf("Edited Successfully\n");
     fclose(editInfo -> fptr_edit_mp3);
